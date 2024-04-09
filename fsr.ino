@@ -39,9 +39,9 @@
     Keyboard.release('a' + button_num - 1);
   }
 #endif
-
+int count=0;
 // Default threshold value for each of the sensors.
-const int16_t kDefaultThreshold = 1000;
+const int16_t kDefaultThreshold = 30;
 // Max window size for both of the moving averages classes.
 const size_t kWindowSize = 50;
 // Baud rate used for Serial communication. Technically ignored by Teensys.
@@ -60,7 +60,7 @@ uint8_t curButtonNum = 1;
 // some existing sensor pins so if you see some weird behavior it might be
 // because of this. Uncomment the following line to enable the feature.
 
-// #define ENABLE_LIGHTS
+ #define ENABLE_LIGHTS
 
 // We don't want to use digital pins 0 and 1 as they're needed for Serial
 // communication so we start curLightPin from 2.
@@ -457,10 +457,12 @@ class Sensor {
 // };
 
 Sensor kSensors[] = {
-  Sensor(A0),
-  Sensor(A1),
-  Sensor(A2),
-  Sensor(A3),
+  Sensor(A4),
+  Sensor(A5),
+  Sensor(A6),
+  Sensor(A7),
+  Sensor(A8),
+  Sensor(A9),
 };
 const size_t kNumSensors = sizeof(kSensors)/sizeof(Sensor);
 
@@ -572,9 +574,11 @@ void setup() {
 	  // which is a good balance between speed and accuracy.
 	  // More information can be found here: http://www.gammon.com.au/adc
 	  SET_BIT(ADCSRA, ADPS2);
+	  analogReference(INTERNAL)
 	  CLEAR_BIT(ADCSRA, ADPS1);
 	  CLEAR_BIT(ADCSRA, ADPS0);
   #endif
+    delay(100);
 }
 
 void loop() {
@@ -586,6 +590,7 @@ void loop() {
   // Separate out the initialization and the update steps for willSend.
   // Since willSend is static, we want to make sure we update the variable
   // every time we loop.
+
   willSend = (loopTime == -1 || startMicros - lastSend + loopTime >= 1000);
 
   serialProcessor.CheckAndMaybeProcessData();
@@ -593,7 +598,6 @@ void loop() {
   for (size_t i = 0; i < kNumSensors; ++i) {
     kSensors[i].EvaluateSensor(willSend);
   }
-
   if (willSend) {
     lastSend = startMicros;
     #ifdef CORE_TEENSY
