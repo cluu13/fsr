@@ -108,7 +108,7 @@
 #endif
 int count=0;
 // Default threshold value for each of the sensors.
-const int16_t kDefaultThreshold = 30;
+const int16_t kDefaultThreshold = 15;
 // Max window size for both of the moving averages classes.
 const size_t kWindowSize = 50;
 // Baud rate used for Serial communication. Technically ignored by Teensys.
@@ -646,6 +646,7 @@ void setup() {
 	  CLEAR_BIT(ADCSRA, ADPS0);
   #endif
     delay(100);
+ 
 }
 
 void loop() {
@@ -661,7 +662,13 @@ void loop() {
   willSend = (loopTime == -1 || startMicros - lastSend + loopTime >= 1000);
 
   serialProcessor.CheckAndMaybeProcessData();
-
+ static int count = 0;
+  if(count<100){//"self calibrate on startup"
+    if (count==99){
+    serialProcessor.UpdateOffsets();
+    }
+    count++;
+  }
   for (size_t i = 0; i < kNumSensors; ++i) {
     kSensors[i].EvaluateSensor(willSend);
   }
@@ -674,5 +681,6 @@ void loop() {
 
   if (loopTime == -1) {
     loopTime = micros() - startMicros;
+    
   }
 }
