@@ -108,7 +108,7 @@
 #endif
 int count=0;
 // Default threshold value for each of the sensors.
-const int16_t kDefaultThreshold = 15;
+const int16_t kDefaultThreshold = 20;
 // Max window size for both of the moving averages classes.
 const size_t kWindowSize = 50;
 // Baud rate used for Serial communication. Technically ignored by Teensys.
